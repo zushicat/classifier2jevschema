@@ -16,9 +16,9 @@ Jev API (curl, the TypeSafe SDKs, any HTTP client) only has to change the base U
 From the 🤗 page:
 "A high-throughput inference engine for structured information extraction, decision routing, and categorical classification on Apple Silicon using MLX."
 
-So, this is basically an inference engine that turns the default LLM
-`mlx-community/Qwen2.5-1.5B-Instruct-4bit` into a fast-running classifier which can be
+So, this is basically an inference engine that turns the default LLM `mlx-community/Qwen2.5-1.5B-Instruct-4bit` into a fast-running classifier which can be
 easily served on your local machine.
+
 
 ## So what's the problem?
 No actual problem, but it would be nice to be able to use the same schema as
@@ -62,13 +62,16 @@ Jev-style request from the **host**:
 curl -s -X POST http://localhost:11100/v1/systemone \
   -H 'Content-Type: application/json' \
   -d '{
-    "state": "My cat has food allergies. Does your pet food contain any allergens?",
+    "state": "I see a dangerous dwarf on the road to the east.",
     "model": "jev-latest",
     "questions": {
-      "is_request": { "type": "noul", "instructions": "Is this a request?" },
-      "pet_type":   { "type": "choice",
-                      "instructions": "What kind of pet does the customer have?",
-                      "criteria": { "CAT": null, "BIRD": null, "DOG": null } }
+      "danger_close": { "type": "noul", "instructions": "Is any dangerous creature close to me?", "criteria": {
+        "true": "i can see a dangerous creature",
+        "false": "i see no dangerous creature"
+      } },
+      "avoid_direction":   { "type": "choice",
+                      "instructions": "In which direction do I see a dangerous creature?",
+                      "criteria": { "NORTH": null, "WEST": null, "EAST": null, "SOUTH": null } }
     }
   }' | python3 -m json.tool
 ```
