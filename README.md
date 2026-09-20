@@ -69,9 +69,8 @@ curl -s -X POST http://localhost:11100/v1/systemone \
         "true": "i can see a dangerous creature",
         "false": "i see no dangerous creature"
       } },
-      "avoid_direction":   { "type": "choice",
-                      "instructions": "In which direction do I see a dangerous creature?",
-                      "criteria": { "NORTH": null, "WEST": null, "EAST": null, "SOUTH": null } }
+      "avoid_direction":   { "type": "choice", "instructions": "In which direction do I see a dangerous creature?",
+        "criteria": { "NORTH": null, "WEST": null, "EAST": null, "SOUTH": null } }
     }
   }' | python3 -m json.tool
 ```
