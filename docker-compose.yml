@@ -1,0 +1,15 @@
+services:
+  classifier2jevschema:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+    ports:
+      - 11100:80
+    restart: on-failure
+    command: uvicorn app:app --reload --host 0.0.0.0 --port 80

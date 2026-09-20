@@ -1,0 +1,109 @@
+# classifier2jevschema — REST Client requests (VS Code "REST Client" extension)
+# Default workflow: the container runs with USE_API_KEY=false and the app is
+# reachable from the host at http://localhost:11100.
+# When testing auth, set USE_API_KEY=true and API_KEY=sk-1234, then
+# `docker compose up -d --force-recreate`, and use the @apiKey variable below.
+
+@host = http://localhost:11100
+# @apiKey = sk-1234
+
+# ********
+# Health check (unauthenticated)
+# ********
+GET {{host}}/
+
+# ********
+# Model catalog (TypeSafe SDK: client.models.list())
+# ********
+GET {{host}}/v1/models
+
+# ********
+# POST /v1/systemone — mixed noul + choice + score (plan §2.7 example)
+# ********
+POST {{host}}/v1/systemone
+Content-Type: application/json
+
+{
+  "state": "My cat has food allergies. Does your pet food contain any allergens? The customer is quite frustrated about repeated failed deliveries.",
+  "model": "jev-latest",
+  "questions": {
+    "is_request": { "type": "noul", "instructions": "Is this a request?" },
+    "department": {
+      "type": "choice",
+      "instructions": "What kind of pet does the customer have?",
+      "criteria": { "CAT": null, "BIRD": null, "DOG": null }
+    },
+    "frustration": {
+      "type": "score",
+      "instructions": "How frustrated is the customer?",
+      "criteria": ["Calm", "Frustrated", "Very angry"]
+    }
+  }
+}
+
+# ********
+# POST /v1/systemone — state as an object (JSON-serialized into the engine context)
+# ********
+POST {{host}}/v1/systemone
+Content-Type: application/json
+
+{
+  "state": { "customer": "frustrated", "topic": "pet food allergens" },
+  "model": "jev-preview",
+  "questions": {
+    "is_allergy_question": {
+      "type": "noul",
+      "instructions": "Is this about allergies?",
+      "criteria": {
+        "true": "The message asks about allergens",
+        "false": "The message is about something else"
+      }
+    }
+  }
+}
+
+# ********
+# POST /v1/systemone — validation failure (scalar state -> 422)
+# ********
+POST {{host}}/v1/systemone
+Content-Type: application/json
+
+{
+  "state": 7,
+  "model": "jev-latest",
+  "questions": {
+    "q": { "type": "noul", "instructions": "Is this a request?" }
+  }
+}
+
+# ********
+# POST /v1/systemone — wrong-token variant
+# (403 "Invalid token" when USE_API_KEY=true; ignored otherwise)
+# ********
+POST {{host}}/v1/systemone
+Content-Type: application/json
+Authorization: Bearer sk-wrong-token
+
+{
+  "state": "My cat has food allergies. Does your pet food contain any allergens?",
+  "model": "jev-latest",
+  "questions": {
+    "is_request": { "type": "noul", "instructions": "Is this a request?" }
+  }
+}
+
+# ********
+# POST /v1/systemone — correctly authenticated variant
+# (enable @apiKey above and USE_API_KEY=true first)
+# ********
+# POST {{host}}/v1/systemone
+# Content-Type: application/json
+# Authorization: Bearer {{apiKey}}
+#
+# {
+#   "state": "My cat has food allergies. Does your pet food contain any allergens?",
+#   "model": "jev-latest",
+#   "questions": {
+#     "is_request": { "type": "noul", "instructions": "Is this a request?" }
+#   }
+# }
