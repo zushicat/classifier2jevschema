@@ -1,4 +1,6 @@
 # classifier2jevschema — a Jev-compatible proxy for the local Parallel Constrained Decision Engine
+This is a drop-in Jev proxy for a local classifier: FastAPI adapter that exposes TypeSafe's POST /v1/systemone API (noul/choice/score questions) on top of a locally hosted Parallel Constrained Decision Engine, so any typesafe.ai-compatible client works offline by just changing the base URL.
+
 
 This app translates between the i/o schema used by the local classifier engine
 ([harshatheg/Qwen-2.5-1B-RLCD](https://huggingface.co/harshatheg/Qwen-2.5-1B-RLCD)) and
